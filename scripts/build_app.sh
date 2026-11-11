@@ -3,11 +3,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-swift build -c release --product NuKey
+BUILD_PATH="${NUKEY_BUILD_PATH:-.build}"
+VERSION="$(tr -d '\n' < VERSION)"
+swift build -c release --product NuKey --arch arm64 --arch x86_64 --scratch-path "$BUILD_PATH"
 APP="build/NuKey.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
-cp .build/release/NuKey "$APP/Contents/MacOS/NuKey"
+cp "$BUILD_PATH/release/NuKey" "$APP/Contents/MacOS/NuKey"
 mkdir -p "$APP/Contents/Resources"
 cp Resources/AppIcon.icns Resources/MenuIcon.png Resources/MenuIcon@2x.png Resources/MenuIcon-EN-generated.png Resources/MenuIcon-VI-generated.png "$APP/Contents/Resources/"
 
@@ -21,7 +23,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleIdentifier</key><string>local.nukey.vni</string>
     <key>CFBundleName</key><string>NuKey</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>0.1</string>
+    <key>CFBundleShortVersionString</key><string>$VERSION</string>
     <key>CFBundleVersion</key><string>1</string>
     <key>LSMinimumSystemVersion</key><string>13.0</string>
     <key>LSUIElement</key><true/>
@@ -29,5 +31,5 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-codesign --force --sign - "$APP" >/dev/null 2>&1 || true
+codesign --force --sign - "$APP" >/dev/null
 echo "Đã tạo: $(pwd)/$APP"

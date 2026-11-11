@@ -5,6 +5,13 @@
 <h1 align="center">NuKey</h1>
 
 <p align="center">
+  <a href="https://github.com/ashtonluk/nukey/releases/tag/v0.1.0"><img src="https://img.shields.io/badge/phi%C3%AAn_b%E1%BA%A3n-0.1.0-blue" alt="Phiên bản 0.1.0"></a>
+  <img src="https://img.shields.io/badge/macOS-13%2B-555555" alt="macOS 13 trở lên">
+  <img src="https://img.shields.io/badge/ki%E1%BA%BFn_tr%C3%BAc-Apple_Silicon%20%7C%20Intel-555555" alt="Apple Silicon và Intel">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/gi%E1%BA%A5y_ph%C3%A9p-MIT-green" alt="Giấy phép MIT"></a>
+</p>
+
+<p align="center">
   Bộ gõ tiếng Việt gọn nhẹ dành cho macOS, hoạt động ngay trên thanh menu.
 </p>
 
@@ -24,10 +31,49 @@
 ## Yêu cầu
 
 - macOS 13 trở lên.
-- Xcode hoặc Xcode Command Line Tools có Swift 5.9 trở lên để biên dịch.
+- Máy Mac dùng Apple Silicon hoặc Intel.
+- Xcode hoặc Xcode Command Line Tools có Swift 5.9 trở lên nếu biên dịch từ mã nguồn.
 - Quyền **Trợ năng** và, nếu macOS yêu cầu, **Giám sát đầu vào** để xử lý phím gõ.
 
-## Cài đặt từ mã nguồn
+## Tải và cài đặt
+
+### Cài đặt bằng Terminal
+
+Chạy lệnh sau để tải và cài NuKey **0.1.0** vào `~/Applications`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ashtonluk/nukey/v0.1.0/scripts/install.sh | bash
+```
+
+Trình cài kiểm tra SHA-256 của tệp tải về trước khi cài và không ghi đè nếu `~/Applications/NuKey.app` đã tồn tại. Bạn có thể xem [mã trình cài](scripts/install.sh) trước khi chạy.
+
+Sau khi cài, mở ứng dụng bằng lệnh sau hoặc mở **NuKey** trong thư mục **Ứng dụng** của tài khoản:
+
+```bash
+open ~/Applications/NuKey.app
+```
+
+### Tải tệp ứng dụng
+
+Tải [NuKey 0.1.0 cho macOS](https://github.com/ashtonluk/nukey/releases/download/v0.1.0/NuKey-0.1.0-macos.zip), giải nén và chuyển `NuKey.app` vào thư mục **Ứng dụng**. Xem thêm [trang phát hành](https://github.com/ashtonluk/nukey/releases/tag/v0.1.0).
+
+Mã kiểm tra của tệp `NuKey-0.1.0-macos.zip`:
+
+| Thuật toán | Mã kiểm tra |
+| --- | --- |
+| SHA-256 | `b26e5a2d3edb63c709500fc28df32bec5e5b8ab54570055e5f1451d3f6bd4436` |
+| MD5 | `f67a767e9c649f967e2c31b4d0ab7b5d` |
+
+Để tự kiểm tra sau khi tải, mở Terminal tại thư mục chứa tệp và chạy:
+
+```bash
+shasum -a 256 NuKey-0.1.0-macos.zip
+md5 NuKey-0.1.0-macos.zip
+```
+
+Bản phát hành được ký cục bộ và **chưa được Apple công chứng**, vì vậy macOS có thể chặn ứng dụng khi mở lần đầu. Nếu tin tưởng bản tải về, kiểm tra mã SHA-256 ở trên rồi cho phép mở trong **Cài đặt hệ thống → Quyền riêng tư & Bảo mật**. Bản dựng gồm cả hai kiến trúc; chưa được kiểm tra thực tế trên máy Mac Intel.
+
+### Cài đặt từ mã nguồn
 
 Tải mã nguồn về máy, mở Terminal tại thư mục dự án và chạy:
 
