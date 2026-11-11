@@ -22,3 +22,10 @@
 .env
 .env.*
 !.env.example
+
+# Cloudflare Wrangler: bộ nhớ đệm, biến môi trường và khóa cục bộ (không đưa lên Git)
+/.wrangler/
+.dev.vars
+.dev.vars.*
+.wrangler.toml.local
+node_modules/

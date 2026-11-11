@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nukey",
+  "compatibility_date": "2026-11-12",
+  "assets": {
+    "directory": "./site"
+  },
+  "routes": [
+    { "pattern": "nukey.vinarpg.com", "custom_domain": true }
+  ]
+}
