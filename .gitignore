@@ -1,0 +1,24 @@
+# Kết quả biên dịch Swift và ứng dụng được tạo cục bộ
+/.build/
+/build/
+/DerivedData/
+
+# Cấu hình cá nhân của Xcode và Swift Package Manager
+/.swiftpm/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+
+# Tệp do macOS và trình soạn thảo tạo ra
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+
+# Nhật ký và cấu hình môi trường cục bộ
+*.log
+.env
+.env.*
+!.env.example
