@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-VERSION="0.1.0"
-SHA256="b26e5a2d3edb63c709500fc28df32bec5e5b8ab54570055e5f1451d3f6bd4436"
+VERSION="0.1.1"
+SHA256="2ec3fcb9bfb4a26962880afeae395dc3f73d2ec55934badf9e0ff95c27e89108"
 ARCHIVE="NuKey-${VERSION}-macos.zip"
 URL="https://github.com/ashtonluk/nukey/releases/download/v${VERSION}/${ARCHIVE}"
 INSTALL_DIR="${NUKEY_INSTALL_DIR:-$HOME/Applications}"

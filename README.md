@@ -5,7 +5,7 @@
 <h1 align="center">NuKey</h1>
 
 <p align="center">
-  <a href="https://github.com/ashtonluk/nukey/releases/tag/v0.1.0"><img src="https://img.shields.io/badge/phi%C3%AAn_b%E1%BA%A3n-0.1.0-blue" alt="Phiên bản 0.1.0"></a>
+  <a href="https://github.com/ashtonluk/nukey/releases/tag/v0.1.1"><img src="https://img.shields.io/badge/phi%C3%AAn_b%E1%BA%A3n-0.1.1-blue" alt="Phiên bản 0.1.1"></a>
   <img src="https://img.shields.io/badge/macOS-13%2B-555555" alt="macOS 13 trở lên">
   <img src="https://img.shields.io/badge/ki%E1%BA%BFn_tr%C3%BAc-Apple_Silicon%20%7C%20Intel-555555" alt="Apple Silicon và Intel">
   <a href="LICENSE"><img src="https://img.shields.io/badge/gi%E1%BA%A5y_ph%C3%A9p-MIT-green" alt="Giấy phép MIT"></a>
@@ -22,6 +22,7 @@
 ## Tính năng
 
 - Gõ tiếng Việt theo **VNI** hoặc **Simple Telex**; VNI được chọn mặc định.
+- Tự giữ nguyên phím đã gõ khi từ không phải tiếng Việt, ví dụ `melbourne1` không bị thành `mélbourne`.
 - Chuyển nhanh giữa tiếng Anh và tiếng Việt bằng thanh chọn hoặc phím tắt.
 - Tùy chọn tổ hợp **Control + Shift**, **Command + Shift**, **Option + Shift** hoặc tắt phím tắt.
 - Tạo danh sách từ thay thế, nhập và xuất danh sách dưới dạng tệp TXT.
@@ -39,10 +40,10 @@
 
 ### Cài đặt bằng Terminal
 
-Chạy lệnh sau để tải và cài NuKey **0.1.0** vào `~/Applications`:
+Chạy lệnh sau để tải và cài NuKey **0.1.1** vào `~/Applications`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ashtonluk/nukey/v0.1.0/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ashtonluk/nukey/v0.1.1/scripts/install.sh | bash
 ```
 
 Trình cài kiểm tra SHA-256 của tệp tải về trước khi cài và không ghi đè nếu `~/Applications/NuKey.app` đã tồn tại. Bạn có thể xem [mã trình cài](scripts/install.sh) trước khi chạy.
@@ -55,20 +56,20 @@ open ~/Applications/NuKey.app
 
 ### Tải tệp ứng dụng
 
-Tải [NuKey 0.1.0 cho macOS](https://github.com/ashtonluk/nukey/releases/download/v0.1.0/NuKey-0.1.0-macos.zip), giải nén và chuyển `NuKey.app` vào thư mục **Ứng dụng**. Xem thêm [trang phát hành](https://github.com/ashtonluk/nukey/releases/tag/v0.1.0).
+Tải [NuKey 0.1.1 cho macOS](https://github.com/ashtonluk/nukey/releases/download/v0.1.1/NuKey-0.1.1-macos.zip), giải nén và chuyển `NuKey.app` vào thư mục **Ứng dụng**. Xem thêm [trang phát hành](https://github.com/ashtonluk/nukey/releases/tag/v0.1.1).
 
-Mã kiểm tra của tệp `NuKey-0.1.0-macos.zip`:
+Mã kiểm tra của tệp `NuKey-0.1.1-macos.zip`:
 
 | Thuật toán | Mã kiểm tra |
 | --- | --- |
-| SHA-256 | `b26e5a2d3edb63c709500fc28df32bec5e5b8ab54570055e5f1451d3f6bd4436` |
-| MD5 | `f67a767e9c649f967e2c31b4d0ab7b5d` |
+| SHA-256 | `2ec3fcb9bfb4a26962880afeae395dc3f73d2ec55934badf9e0ff95c27e89108` |
+| MD5 | `fff60b71cef8f6de830f65d0017e3550` |
 
 Để tự kiểm tra sau khi tải, mở Terminal tại thư mục chứa tệp và chạy:
 
 ```bash
-shasum -a 256 NuKey-0.1.0-macos.zip
-md5 NuKey-0.1.0-macos.zip
+shasum -a 256 NuKey-0.1.1-macos.zip
+md5 NuKey-0.1.1-macos.zip
 ```
 
 Bản phát hành được ký cục bộ và **chưa được Apple công chứng**, vì vậy macOS có thể chặn ứng dụng khi mở lần đầu. Nếu tin tưởng bản tải về, kiểm tra mã SHA-256 ở trên rồi cho phép mở trong **Cài đặt hệ thống → Quyền riêng tư & Bảo mật**. Bản dựng gồm cả hai kiến trúc; chưa được kiểm tra thực tế trên máy Mac Intel.
@@ -118,6 +119,12 @@ Dữ liệu được lưu tại:
 ### Khởi động cùng máy Mac
 
 NuKey thử bật khởi động cùng máy Mac trong lần mở đầu tiên. Sau đó, bạn có thể bật hoặc tắt tùy chọn này ngay trong menu. Nếu macOS yêu cầu cho phép, hãy kiểm tra **Cài đặt hệ thống → Cài đặt chung → Mục đăng nhập**.
+
+## Nhật ký thay đổi
+
+**0.1.1** (15/11/2026): sửa dấu móc cho `ưu` và `ươu` (`cuu71` → `cứu`, `ruou75` → `rượu`), số `0` luôn giữ nguyên, giữ nguyên phím với từ không phải tiếng Việt và tránh xóa nhầm chữ khi máy thiếu RAM.
+
+Xem đầy đủ trong [CHANGELOG.md](CHANGELOG.md).
 
 ## Kiểm tra và đóng góp
 

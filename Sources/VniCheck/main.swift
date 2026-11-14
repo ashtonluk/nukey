@@ -29,6 +29,14 @@ check("co1", "có")
 check("cuu71", "cứu"); check("cu7u1", "cứu"); check("huu7", "hưu"); check("luu7", "lưu")
 check("ruou75", "rượu"); check("nuo7c1", "nước"); check("u7o7", "ươ"); check("quo7", "quơ")
 check("duong77", "duong7"); check("o77", "o7"); check("bo7", "bơ")
+// Từ không phải tiếng Việt: giữ nguyên phím đã gõ
+check("melbourne1", "melbourne1"); check("me2lbourne1", "me2lbourne1"); check("hello2", "hello2")
+check("facebook1", "facebook1"); check("windows6", "windows6"); check("street1", "street1")
+check("iphone7", "iphone7"); check("zalo1", "zalo1")
+// Từ tiếng Việt vẫn gõ bình thường
+check("nguye6n4", "nguyễn"); check("khuya1", "khuýa"); check("quye6n2", "quyền"); check("xoong", "xoong")
+check("gi2", "gì"); check("gio72", "giờ"); check("ngoa8n2", "ngoằn"); check("pho73", "phở"); check("d9i", "đi")
+check("tru7o7ng2", "trường"); check("nghie6ng1", "nghiếng"); check("yeu6", "yêu"); check("ye6u1", "yếu")
 // Số giữ nguyên
 check("2024", "2024"); check("a11", "a1")
 // Hoa
@@ -79,6 +87,16 @@ checkShortcut(.optionShift, [.option, [.option, .shift], .option, []], expected:
 checkShortcut(.controlShift, [.control, [.control, .shift], .control, []], expected: 0, cancelAt: 2)
 checkShortcut(.controlShift, [.control, [.control, .shift], [.control, .shift, .command], .control, []], expected: 0)
 checkShortcut(.none, [.control, [.control, .shift], .control, []], expected: 0)
+
+// Xóa lùi khi đang giữ nguyên phím
+let rawWord = VniEngine()
+for k in "mel1" { rawWord.feed(k) }
+assert(rawWord.current == "mel1")
+rawWord.backspace()
+assert(rawWord.current == "mel")
+rawWord.feed(" ")
+for k in "co1" { rawWord.feed(k) }
+assert(rawWord.current == "có")
 
 // Tách từ và xóa
 let e = VniEngine()

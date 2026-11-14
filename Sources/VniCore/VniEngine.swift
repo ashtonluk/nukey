@@ -22,6 +22,10 @@ public final class VniEngine {
 
     private var glyphs: [Glyph] = []
     private var tone: Int = 0    // 0 = không dấu, 1...5
+    /// Các phím đã gõ trong từ hiện tại, dùng để khôi phục khi từ không phải tiếng Việt.
+    private var raw = ""
+    /// true khi từ hiện tại không phải âm tiết tiếng Việt: giữ nguyên phím gõ cho tới hết từ.
+    private var rawMode = false
     /// Chuỗi đang hiển thị của từ hiện tại.
     public private(set) var current: String = ""
     public var inputMethod: InputMethod = .vni {
@@ -33,11 +37,19 @@ public final class VniEngine {
     public func reset() {
         glyphs.removeAll(keepingCapacity: true)
         tone = 0
+        raw = ""
+        rawMode = false
         current = ""
     }
 
     /// Xóa ký tự cuối (khi người dùng bấm Backspace).
     public func backspace() {
+        if rawMode {
+            if !raw.isEmpty { raw.removeLast() }
+            if raw.isEmpty { reset() } else { current = raw }
+            return
+        }
+        if !raw.isEmpty { raw.removeLast() }
         if !glyphs.isEmpty { glyphs.removeLast() }
         if glyphs.isEmpty { tone = 0 }
         current = render()
@@ -47,6 +59,14 @@ public final class VniEngine {
     /// Ký tự không phải chữ/số kết thúc từ: trả về chuỗi rỗng.
     @discardableResult
     public func feed(_ c: Character) -> String {
+        let isWordKey = c.isASCII && (c.isLetter || c.wholeNumberValue != nil)
+        if isWordKey {
+            raw.append(c)
+            if rawMode {
+                current = raw
+                return current
+            }
+        }
         if c.isASCII && c.isLetter {
             if inputMethod == .telex { feedTelex(c) }
             else { appendLetter(c) }
@@ -57,8 +77,56 @@ public final class VniEngine {
             reset()
             return current
         }
+        // Đã thêm dấu mà từ không còn là âm tiết tiếng Việt (vd: melbourne1, me2lbourne):
+        // trả lại đúng các phím đã gõ và không thêm dấu cho phần còn lại của từ.
+        if (tone != 0 || glyphs.contains(where: { $0.mark != .none })) && !isVietnameseSyllable() {
+            rawMode = true
+            current = raw
+            return current
+        }
         current = render()
         return current
+    }
+
+    // MARK: - Kiểm tra âm tiết tiếng Việt
+
+    private static let initials = ["ngh", "ng", "gh", "gi", "kh", "nh", "ph", "th", "tr", "ch", "qu",
+                                   "b", "c", "d", "g", "h", "k", "l", "m", "n", "p", "r", "s", "t", "v", "x"]
+    private static let finals: Set<String> = ["", "c", "ch", "m", "n", "ng", "nh", "p", "t"]
+    /// Cụm nguyên âm (theo chữ gốc, bỏ dấu): a, ai, ươu → "uou", yêu → "yeu"...
+    private static let nuclei = ["a", "e", "i", "o", "u", "y", "ai", "ao", "au", "ay", "eo", "eu", "ia", "ie",
+                                 "iu", "oa", "oe", "oi", "oo", "ua", "ue", "ui", "uo", "uu", "uy", "ye", "ieu",
+                                 "oai", "oay", "oeo", "uoi", "uou", "uya", "uye", "uyu", "yeu"]
+    /// Cụm nguyên âm được phép đứng trước phụ âm cuối (an, iên, oan, uyên, xoong...).
+    private static let closedNuclei: Set<String> = ["a", "e", "i", "o", "u", "y", "ie", "oa", "oe", "oo",
+                                                    "ua", "ue", "uo", "uy", "uye", "ye"]
+
+    /// Từ đang gõ có thể là (hoặc đang gõ dở) một âm tiết tiếng Việt không:
+    /// phụ âm đầu + cụm nguyên âm + phụ âm cuối. Chỉ xét chữ cái, bỏ qua số.
+    func isVietnameseSyllable() -> Bool {
+        let vowels: Set<Character> = ["a", "e", "i", "o", "u", "y"]
+        let base = String(glyphs.filter(\.isLetter).map(\.char))
+        var rest = Substring(base)
+
+        if let first = rest.first, !vowels.contains(first) {
+            let initial = Self.initials.first { ini in
+                guard rest.hasPrefix(ini) else { return false }
+                if ini == "gi" {          // "gi" là phụ âm đầu chỉ khi sau nó còn nguyên âm (già, giếng)
+                    let after = rest.dropFirst(2)
+                    return after.first.map { vowels.contains($0) } ?? false
+                }
+                return true
+            }
+            guard let initial else { return rest == "q" }   // "q" đứng một mình: đang gõ dở "qu"
+            rest = rest.dropFirst(initial.count)
+        }
+
+        let nucleus = String(rest.prefix { vowels.contains($0) })
+        let final = String(rest.dropFirst(nucleus.count))
+        if nucleus.isEmpty { return final.isEmpty }          // chỉ có phụ âm đầu, vd: đ
+        guard Self.finals.contains(final) else { return false }
+        if final.isEmpty { return Self.nuclei.contains { $0.hasPrefix(nucleus) } }
+        return Self.closedNuclei.contains(nucleus)
     }
 
     private func appendLetter(_ c: Character) {
