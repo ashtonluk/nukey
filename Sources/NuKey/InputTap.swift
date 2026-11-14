@@ -51,7 +51,13 @@ final class InputTap {
 
     private func handle(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            // macOS tạm tắt tap khi NuKey phản hồi chậm (thường do máy thiếu RAM, phải lấy lại bộ nhớ từ swap).
+            // Trong lúc tắt, phím đi thẳng vào app nên từ đang gõ không còn khớp: bỏ từ đó để không xóa nhầm.
+            engine.reset()
+            shortcutDetector.cancel()
             if let port { CGEvent.tapEnable(tap: port, enable: true) }
+            let reason = type == .tapDisabledByTimeout ? "phan hoi cham (timeout)" : "nguoi dung"
+            DispatchQueue.global(qos: .utility).async { Log.write("event tap bi tat tam thoi: \(reason), da bat lai") }
             return Unmanaged.passUnretained(event)
         }
         if event.getIntegerValueField(.eventSourceUserData) == nuKeyMarker {

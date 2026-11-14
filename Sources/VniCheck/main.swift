@@ -15,7 +15,8 @@ func check(_ keys: String, _ expected: String, file: String = #file, line: Int =
 
 // Dấu thanh
 check("a1", "á"); check("a2", "à"); check("a3", "ả"); check("a4", "ã"); check("a5", "ạ")
-check("a50", "a")
+// Số 0 luôn giữ nguyên, không bỏ dấu
+check("co0", "co0"); check("a50", "ạ0"); check("10", "10"); check("co10", "có0")
 // Dấu phụ
 check("a6", "â"); check("e6", "ê"); check("o6", "ô"); check("o7", "ơ"); check("u7", "ư")
 check("a8", "ă"); check("d9", "đ")
@@ -24,6 +25,10 @@ check("viet65", "việt"); check("chao2", "chào"); check("duong7", "dương")
 check("nguoi72", "người"); check("hie65n", "hiện"); check("hien1", "hién"); check("tuy1", "túy")
 check("quan1", "quán"); check("gia1", "giá")
 check("co1", "có")
+// Dấu móc theo cụm nguyên âm: ưu, ươ, ươu
+check("cuu71", "cứu"); check("cu7u1", "cứu"); check("huu7", "hưu"); check("luu7", "lưu")
+check("ruou75", "rượu"); check("nuo7c1", "nước"); check("u7o7", "ươ"); check("quo7", "quơ")
+check("duong77", "duong7"); check("o77", "o7"); check("bo7", "bơ")
 // Số giữ nguyên
 check("2024", "2024"); check("a11", "a1")
 // Hoa
@@ -44,6 +49,8 @@ checkTelex("nguowif", "người"); checkTelex("Vieetj", "Việt")
 checkTelex("aaf", "ầ"); checkTelex("aw", "ă"); checkTelex("ow", "ơ")
 checkTelex("uw", "ư"); checkTelex("ass", "as"); checkTelex("aww", "aw")
 checkTelex("aa", "â"); checkTelex("aaz", "a"); checkTelex("2024", "2024")
+checkTelex("cuuws", "cứu"); checkTelex("cuwus", "cứu"); checkTelex("ruouwj", "rượu")
+checkTelex("quawng", "quăng"); checkTelex("owf", "ờ")
 
 let changeMethod = VniEngine()
 changeMethod.feed("a")

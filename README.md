@@ -98,7 +98,7 @@ Phím tắt mặc định là **Control + Shift**. Nhấn và nhả riêng tổ 
 
 | Kiểu gõ | Dấu thanh | Dấu chữ | Ví dụ |
 | --- | --- | --- | --- |
-| VNI | `1`, `2`, `3`, `4`, `5` | `6`, `7`, `8`, `9`; `0` bỏ dấu thanh | `co1` → `có`, `viet65` → `việt` |
+| VNI | `1`, `2`, `3`, `4`, `5` | `6`, `7`, `8`, `9`; số `0` giữ nguyên | `co1` → `có`, `viet65` → `việt`, `cuu71` → `cứu` |
 | Simple Telex | `s`, `f`, `r`, `x`, `j` | `aa`, `ee`, `oo`, `aw`, `ow`, `uw`, `dd`; `z` bỏ dấu | `cos` → `có`, `tieengs` → `tiếng` |
 
 ### Từ thay thế

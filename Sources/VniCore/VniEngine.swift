@@ -5,7 +5,7 @@ import Foundation
 ///
 /// Quy tắc VNI:
 ///   6 → ^ (â, ê, ô)     7 → móc (ơ, ư)     8 → breve (ă)     9 → đ
-///   1 sắc, 2 huyền, 3 hỏi, 4 ngã, 5 nặng, 0 bỏ dấu thanh
+///   1 sắc, 2 huyền, 3 hỏi, 4 ngã, 5 nặng; số 0 luôn giữ nguyên là số 0
 public enum InputMethod: String, CaseIterable {
     case vni, telex
 }
@@ -97,17 +97,17 @@ public final class VniEngine {
         if key == "w", let i = glyphs.lastIndex(where: {
             $0.isLetter && ["a", "o", "u"].contains($0.char)
         }) {
-            let mark: Mark = glyphs[i].char == "a" ? .breve : .horn
-            if glyphs[i].mark == .none {
-                glyphs[i].mark = mark
-                if glyphs[i].char == "o", i > 0, glyphs[i - 1].char == "u",
-                   glyphs[i - 1].mark == .none { glyphs[i - 1].mark = .horn }
-                return
-            } else if glyphs[i].mark == mark {
-                glyphs[i].mark = .none
-                if glyphs[i].char == "o", i > 0, glyphs[i - 1].char == "u",
-                   glyphs[i - 1].mark == .horn { glyphs[i - 1].mark = .none }
-                appendLetter(c)
+            if glyphs[i].char == "a" {                 // aw → ă
+                if glyphs[i].mark == .none {
+                    glyphs[i].mark = .breve
+                    return
+                } else if glyphs[i].mark == .breve {
+                    glyphs[i].mark = .none
+                    appendLetter(c)
+                    return
+                }
+            } else {                                   // uw, ow, uow, uuw → ư, ơ, ươ, ưu
+                if applyHorn() != .placed { appendLetter(c) }
                 return
             }
         }
@@ -117,8 +117,8 @@ public final class VniEngine {
     // MARK: - Nhập số (dấu VNI)
 
     private func feedDigit(_ d: Int, _ c: Character) {
-        // Số 0–5 chỉ là dấu thanh khi từ đã có nguyên âm; ngược lại giữ như chữ số thường
-        if d <= 5 && vowelIndices().isEmpty {
+        // Số 0 luôn là số 0. Số 1–5 chỉ là dấu thanh khi từ đã có nguyên âm.
+        if d == 0 || (d <= 5 && vowelIndices().isEmpty) {
             glyphs.append(literal(c))
             return
         }
@@ -130,10 +130,8 @@ public final class VniEngine {
             } else {
                 tone = d
             }
-        case 0:
-            tone = 0
         case 6: applyMark(.circumflex, bases: ["a", "e", "o"], literal: c)
-        case 7: applyMark(.horn, bases: ["o", "u"], literal: c)
+        case 7: if applyHorn() != .placed { glyphs.append(literal(c)) }
         case 8: applyMark(.breve, bases: ["a"], literal: c)
         case 9: applyMark(.stroke, bases: ["d"], literal: c)
         default: break
@@ -155,6 +153,45 @@ public final class VniEngine {
         } else {
             glyphs.append(literal(c))    // không có chữ phù hợp: coi như số thường
         }
+    }
+
+    enum HornResult { case placed, removed, none }
+
+    /// Đặt dấu móc theo cụm nguyên âm, dùng chung cho VNI (7) và Telex (w):
+    ///   "uo" → "ươ" (dương, người, rượu), "uu" → "ưu" (cứu, hưu, lưu), còn lại móc chữ u/o cuối.
+    /// Gõ lại khi đã có dấu móc thì bỏ dấu móc.
+    private func applyHorn() -> HornResult {
+        // 1. u + o → ươ ("qu" là phụ âm nên "quo" chỉ móc chữ o)
+        if let i = glyphs.indices.last(where: { i in
+            i > 0 && glyphs[i].isLetter && glyphs[i].char == "o" && glyphs[i].mark == .none &&
+            glyphs[i - 1].isLetter && glyphs[i - 1].char == "u" &&
+            (glyphs[i - 1].mark == .none || glyphs[i - 1].mark == .horn) &&
+            !(i > 1 && glyphs[i - 2].char == "q")
+        }) {
+            glyphs[i - 1].mark = .horn
+            glyphs[i].mark = .horn
+            return .placed
+        }
+        // 2. Đã có dấu móc: gõ lại là bỏ
+        if glyphs.contains(where: { $0.mark == .horn }) {
+            for i in glyphs.indices where glyphs[i].mark == .horn { glyphs[i].mark = .none }
+            return .removed
+        }
+        // 3. u + u → ưu: móc chữ u đầu
+        if let i = glyphs.indices.first(where: { i in
+            i + 1 < glyphs.count &&
+            glyphs[i].isLetter && glyphs[i].char == "u" && glyphs[i].mark == .none &&
+            glyphs[i + 1].isLetter && glyphs[i + 1].char == "u" && glyphs[i + 1].mark == .none
+        }) {
+            glyphs[i].mark = .horn
+            return .placed
+        }
+        // 4. Chữ u/o cuối chưa có dấu
+        if let i = glyphs.lastIndex(where: { $0.isLetter && ($0.char == "u" || $0.char == "o") && $0.mark == .none }) {
+            glyphs[i].mark = .horn
+            return .placed
+        }
+        return .none
     }
 
     private func literal(_ c: Character) -> Glyph {
